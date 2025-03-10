@@ -23,6 +23,7 @@ let app = new Vue({
         ],
         sizes: ['S', 'M', 'L', 'XL', 'XXL', 'XXXL'],
         cart: 0,
+        inStock: false,
     },
 
     methods:{
@@ -31,7 +32,9 @@ let app = new Vue({
         },
 
         removeFromCart(){
-            this.cart -= 1
+            if(this.cart > 0){
+                this.cart -= 1
+            }
         },
 
         updateProduct(variantImage){
