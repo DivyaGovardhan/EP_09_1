@@ -57,5 +57,9 @@ let app = new Vue({
         title() {
           return this.brand + ' ' + this.product;
         },
+
+        sale() {
+          return this.brand + ' ' + this.product + ': ' + (this.onSale ? 'on Sale' : 'not Sale');
+        },
     },
 })
