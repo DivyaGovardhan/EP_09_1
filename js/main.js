@@ -12,11 +12,9 @@ Vue.component('product', {
             <p v-if="inStock">In stock</p>
             <p v-else :class="{ underline: !inStock }">Out of Stock</p>
 
-            <span>{{ sale }}</span>
+            <product-details :details="details"></product-details>
 
-            <ul>
-                <li v-for="detail in details">{{ detail }}</li>
-            </ul>
+            <span>{{ sale }}</span>
             
             <p>Shipping: {{ shipping }}</p>
             
@@ -54,7 +52,12 @@ Vue.component('product', {
         premium: {
             type: Boolean,
             required: true,
-        }
+        },
+
+        details: {
+            type: Array,
+            required: true,
+        },
     },
 
     data() {
@@ -66,7 +69,6 @@ Vue.component('product', {
             altText: "A pair of socks",
             link: "https://www.amazon.com/s/ref=nb_sb_noss?url=search-alias%3Daps&field-keywords=socks",
             onSale: true,
-            details: ['80% cotton', '20% polyester', 'Gender-neutral'],
             variants: [
                 {
                     variantId: 2234,
@@ -126,9 +128,26 @@ Vue.component('product', {
     },
 })
 
+Vue.component('product-details', {
+    template: `
+    <div class="product-details">
+        <ul>
+            <li v-for="detail in details" :key="detail">{{ detail }}</li>
+        </ul>
+    </div>
+    `,
+    props: {
+        details: {
+            type: Array,
+            required: true,
+        }
+    }
+})
+
 let app = new Vue({
     el: '#app',
     data: {
-      premium: false,
+        premium: false,
+        details: ['80% cotton', '20% polyester', 'Gender-neutral'],
     },
 })
