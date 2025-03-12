@@ -25,13 +25,10 @@ Vue.component('product', {
                 @mouseover="updateProduct(index)">
             </div>
 
-            <ul v-for="size in sizes">
-                <li>{{ size }}</li>
+            <ul>
+                <li v-for="size in sizes">{{ size }}</li>
             </ul>
 
-            <div class="cart">
-                <p>Cart({{ cart }})</p>
-            </div>
         </div>
 
         <button v-on:click="addToCart"
@@ -40,7 +37,7 @@ Vue.component('product', {
             Add to cart
         </button>
 
-        <button v-on:click="removeFromCart">Remove from cart</button>
+        <button v-on:click="$emit('remove-from-cart')">Remove from cart</button>
 
         <div class="product-link">
             <a :href="link">More products like this</a>
@@ -84,30 +81,24 @@ Vue.component('product', {
                 }
             ],
             sizes: ['S', 'M', 'L', 'XL', 'XXL', 'XXXL'],
-            cart: 0,
         }
     },
 
     methods: {
-        addToCart(){
-            this.cart += 1
-        },
-
-        removeFromCart(){
-            if(this.cart > 0){
-                this.cart -= 1
-            }
-        },
-
         updateProduct(index){
             this.selectedVariant = index;
             console.log(index);
-        }
+        },
+
+        addToCart() {
+            this.$emit('add-to-cart', this.variants[this.selectedVariant].variantId);
+        },
+
     },
 
     computed: {
         inStock(){
-            return this.variants[this.selectedVariant].variantQuantity
+            return this.variants[this.selectedVariant].variantQuantity > 0;
         },
 
         image() {
@@ -128,6 +119,8 @@ Vue.component('product', {
     },
 })
 
+
+
 Vue.component('product-details', {
     template: `
     <div class="product-details">
@@ -144,10 +137,25 @@ Vue.component('product-details', {
     }
 })
 
+
+
 let app = new Vue({
     el: '#app',
     data: {
         premium: false,
         details: ['80% cotton', '20% polyester', 'Gender-neutral'],
+        cart: [],
+    },
+
+    methods: {
+        updateCart(id) {
+            this.cart.push(id)
+        },
+
+        removeFromCart() {
+            if(this.cart > 0){
+                this.cart -= 1
+            }
+        }
     },
 })
