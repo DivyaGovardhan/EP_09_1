@@ -37,7 +37,7 @@ Vue.component('product', {
             Add to cart
         </button>
 
-        <button v-on:click="$emit('remove-from-cart')">Remove from cart</button>
+        <button v-on:click="removeFromCart">Remove from cart</button>
 
         <div class="product-link">
             <a :href="link">More products like this</a>
@@ -94,6 +94,9 @@ Vue.component('product', {
             this.$emit('add-to-cart', this.variants[this.selectedVariant].variantId);
         },
 
+        removeFromCart() {
+            this.$emit('remove-from-cart', this.variants[this.selectedVariant].variantId);
+        }
     },
 
     computed: {
@@ -152,9 +155,14 @@ let app = new Vue({
             this.cart.push(id)
         },
 
-        removeFromCart() {
-            if(this.cart > 0){
-                this.cart -= 1
+        removeFromCart(id) {
+            if(this.cart.length > 0){
+                for (let i = 0; i < this.cart.length; i++) {
+                    if (this.cart[i] === id) {
+                        this.cart.splice(i, 1);
+                        break;
+                    }
+                }
             }
         }
     },
