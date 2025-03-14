@@ -16,11 +16,7 @@ Vue.component('product', {
             <p v-if="inStock">In stock</p>
             <p v-else :class="{ underline: !inStock }">Out of Stock</p>
 
-            <product-details :details="details"></product-details>
-
             <span>{{ sale }}</span>
-            
-            <p>Shipping: {{ shipping }}</p>
             
             <div class="color-box"
                 v-for="(variant, index) in variants"
@@ -52,11 +48,6 @@ Vue.component('product', {
     props: {
         premium: {
             type: Boolean,
-            required: true,
-        },
-
-        details: {
-            type: Array,
             required: true,
         },
     },
@@ -118,10 +109,6 @@ Vue.component('product', {
 
         sale() {
             return this.brand + ' ' + this.product + ': ' + (this.onSale ? 'on Sale' : 'not Sale');
-        },
-
-        shipping() {
-            return this.premium ? "Free" : 2.99;
         },
     },
 })
@@ -243,14 +230,14 @@ Vue.component('product-tabs', {
         >{{ tab }}</span>
       </ul>
 
-      <div v-if="selectedTab === 'Reviews'">
+      <div v-show="selectedTab === 'Reviews'">
         <p v-if="!reviews.length">There are no reviews yet.</p>
         <ul>
           <li v-for="review in reviews">
             <p>{{ review.name }}</p>
             <p>Rating: {{ review.rating }}</p>
             <p>{{ review.review }}</p>
-            <p>{{ review.recommend }}</p>
+            <p> Recommend: {{ review.recommend }}</p>
           </li>
         </ul>
       </div>
@@ -258,17 +245,35 @@ Vue.component('product-tabs', {
       <div v-show="selectedTab === 'Make a Review'">
         <product-review></product-review>
       </div>
+      
+      <div v-show="selectedTab === 'Shipping'">
+        <p>Shipping: {{ shipping }}</p>
+      </div>
+      
+      <div v-show="selectedTab === 'Details'">
+            <product-details :details="details"></product-details>
+      </div>
     </div>
   `,
 
     data() {
         return {
-            tabs: ['Reviews', 'Make a Review'],
+            tabs: ['Reviews', 'Make a Review', 'Shipping','Details'],
             selectedTab: 'Reviews',
         }
     },
 
     props: {
+        premium: {
+            type: Boolean,
+            required: true,
+        },
+
+        details: {
+            type: Array,
+            required: true,
+        },
+
         reviews: {
             type: Array,
             required: false
@@ -279,7 +284,13 @@ Vue.component('product-tabs', {
         addReview(productReview) {
             this.$emit('add-review', productReview);
         }
-    }
+    },
+
+    computed: {
+        shipping() {
+            return this.premium ? "Free" : 2.99;
+        },
+    },
 })
 
 
@@ -289,7 +300,7 @@ Vue.component('product-tabs', {
 let app = new Vue({
     el: '#app',
     data: {
-        premium: false,
+        premium: true,
         details: ['80% cotton', '20% polyester', 'Gender-neutral'],
         cart: [],
         reviews: [],
