@@ -150,11 +150,7 @@ Vue.component('product-review', {
             <p>
                 <label for="rating">Rating:</label>
                 <select id="rating" v-model.number="rating">
-                    <option>5</option>
-                    <option>4</option>
-                    <option>3</option>
-                    <option>2</option>
-                    <option>1</option>
+                    <option v-for="r in availableRatings" :value="r">{{ r }}</option>
                 </select>
             </p>
             
@@ -191,27 +187,61 @@ Vue.component('product-review', {
         }
     },
 
+    computed: {
+        availableRatings() {
+            if (this.recommend === 'yes') return [3, 4, 5]
+            if (this.recommend === 'no') return [1, 2]
+            return [1, 2, 3, 4, 5]
+        }
+    },
+
+    watch: {
+        recommend() {
+            // Сбрасываем рейтинг, если текущее значение недопустимо
+            if (!this.availableRatings.includes(this.rating)) {
+                this.rating = null
+            }
+        },
+        rating() {
+            // Сбрасываем рекомендацию, если рейтинг противоречит выбору
+            if (this.recommend === 'yes' && [1, 2].includes(this.rating)) {
+                this.recommend = null
+            }
+            if (this.recommend === 'no' && [3, 4, 5].includes(this.rating)) {
+                this.recommend = null
+            }
+        }
+    },
+
     methods: {
         onSubmit() {
-            if(this.name && this.review && this.rating && this.recommend) {
-                let productReview = {
+            this.errors = []
+
+            // Базовые проверки
+            if (!this.name) this.errors.push("Name required.")
+            if (!this.review) this.errors.push("Review required.")
+            if (!this.rating) this.errors.push("Rating required.")
+            if (!this.recommend) this.errors.push("Recommendation required.")
+
+            // Проверка соответствия рейтинга и рекомендации
+            if (this.recommend === 'yes' && [1, 2].includes(this.rating)) {
+                this.errors.push("Positive recommendation requires rating 3-5")
+            }
+            if (this.recommend === 'no' && [3, 4, 5].includes(this.rating)) {
+                this.errors.push("Negative recommendation requires rating 1-2")
+            }
+
+            if (!this.errors.length) {
+                // Отправка данных
+                const review = {
                     name: this.name,
                     review: this.review,
                     rating: this.rating,
-                    recommend: this.recommend,
+                    recommend: this.recommend
                 }
-                eventBus.$emit('review-submitted', productReview)
-                this.name = null
-                this.review = null
-                this.rating = null
-                this.recommend = null
-                this.errors = [];
-            } else {
-                this.errors = [];
-                if(!this.name) this.errors.push("Name required.")
-                if(!this.review) this.errors.push("Review required.")
-                if(!this.rating) this.errors.push("Rating required.")
-                if(!this.recommend) this.errors.push("Recommending required.")
+                eventBus.$emit('review-submitted', review)
+                // Сброс полей
+                this.name = this.review = this.rating = this.recommend = null
             }
         }
     }
