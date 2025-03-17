@@ -333,7 +333,16 @@ let app = new Vue({
         premium: true,
         details: ['80% cotton', '20% polyester', 'Gender-neutral'],
         cart: [],
-        reviews: [],
+        reviews: JSON.parse(localStorage.getItem('productReviews')) || [],
+    },
+
+    watch: {
+        reviews: {
+            handler(newVal) {
+                localStorage.setItem('productReviews', JSON.stringify(newVal))
+            },
+            deep: true
+        }
     },
 
     methods: {
